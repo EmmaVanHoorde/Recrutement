@@ -1,3 +1,64 @@
+<?php
+//Connexion à la base
+$servername = "localhost";
+$username = "root";
+$password = "";
+
+try{
+	$conn = new
+	PDO("mysql:host=$servername;dbname=mini-site", $username, $password, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
+	//set the PDO error mode to exception
+	$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	echo "Connected successfully <br>";
+}
+catch(PDOException $e){
+	echo "Connection failed";
+}
+
+$competences_array = array();
+
+$reqSQL = $conn->prepare("SELECT intitule_competences FROM competences");
+	$reqSQL->execute();
+
+while($row= $reqSQL-> fetch(PDO::FETCH_ASSOC)){
+  if((in_array($row['intitule_competences'], $competences_array) == false)) {
+    $competences_array[] = $row['intitule_competences'];
+  }
+}
+
+$formations_array = array();
+
+$reqSQL = $conn->prepare("SELECT intitule FROM formations");
+	$reqSQL->execute();
+
+while($row= $reqSQL-> fetch(PDO::FETCH_ASSOC)){
+  if((in_array($row['intitule'], $formations_array) == false)) {
+    $formations_array[] = $row['intitule'];
+  }
+}
+
+$postes_array = array();
+
+$reqSQL = $conn->prepare("SELECT poste FROM experiences");
+	$reqSQL->execute();
+
+while($row= $reqSQL-> fetch(PDO::FETCH_ASSOC)){
+  if((in_array($row['poste'], $postes_array) == false)) {
+    $postes_array[] = $row['poste'];
+  }
+}
+
+print_r(array_values($competences_array));
+print_r(array_values($formations_array));
+print_r(array_values($postes_array));
+
+$array_count = array_count_values($postes_array)
+
+// Close connexion
+// $reqSQL = null;
+// $conn = null;
+ ?>
+
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -13,9 +74,34 @@
     <h3>Filtres:</h3>
     <ul>
       <li> <select name="poste">
-            <option value="">poste</option>
-            <option value="Webdesigner">Webdesigner</option>
-            <option value="developpeur web">Développeur web</option>
+              <option value="">poste</option>
+              <?php
+              foreach($postes_array as $key => $value):
+              echo '<option value="'.$value.'">'.$value.'</option>';
+              endforeach;
+              ?>
+          </select>
+      </li>
+    </ul>
+    <ul>
+      <li> <select name="competences">
+              <option value="">competences</option>
+              <?php
+              foreach($competences_array as $key => $value):
+              echo '<option value="'.$value.'">'.$value.'</option>';
+              endforeach;
+              ?>
+          </select>
+      </li>
+    </ul>
+    <ul>
+      <li> <select name="formations">
+              <option value="">formations</option>
+              <?php
+              foreach($formations_array as $key => $value):
+              echo '<option value="'.$value.'">'.$value.'</option>';
+              endforeach;
+              ?>
           </select>
       </li>
     </ul>
